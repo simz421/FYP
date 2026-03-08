@@ -1,0 +1,55 @@
+{
+  "folders": [
+    { "name": "backend", "path": "backend" },
+    { "name": "frontend", "path": "frontend" },
+  ],
+  "settings": {
+    "files.eol": "\n",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+    "python.defaultInterpreterPath": "${workspaceFolder:backend}\\.venv\\Scripts\\python.exe",
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.typeCheckingMode": "basic",
+
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.python",
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+    },
+
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact",
+    ],
+    "eslint.workingDirectories": [{ "mode": "auto" }],
+
+    "tailwindCSS.experimental.classRegex": [
+      ["className\\s*=\\s*\"([^\"]*)\"", 1],
+      ["className\\s*=\\s*\\{`([^`]*)`\\}", 1],
+    ],
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "ms-python.black-formatter",
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "bradlc.vscode-tailwindcss",
+      "dsznajder.es7-react-js-snippets",
+      "rangav.vscode-thunder-client",
+      "qwtel.sqlite-viewer",
+      "humao.rest-client",
+      "eamodio.gitlens",
+      "streetsidesoftware.code-spell-checker",
+      "github.copilot",
+    ],
+  },
+}

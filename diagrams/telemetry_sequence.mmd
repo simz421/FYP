@@ -1,0 +1,18 @@
+sequenceDiagram
+  participant Device
+  participant API as Flask API
+  participant Telemetry as TelemetryService
+  participant DB as SQLite
+  participant Alerts as AlertsService
+
+  Device->>API: POST /api/telemetry/readings
+  API->>Telemetry: ingest_telemetry(payload)
+  Telemetry->>DB: INSERT SensorReading(s)
+  Telemetry->>DB: INSERT RouteEvent
+  Telemetry->>DB: COMMIT
+  Telemetry->>Alerts: evaluate_reading(reading)
+  Alerts->>DB: INSERT/UPDATE AlertEvent
+  Telemetry->>WS: broadcast_new_reading(reading)
+  Alerts->>WS: broadcast_new_alert(alert)
+  Telemetry-->>API: return 201, {inserted, rejected, evaluations}
+  API-->>Device: HTTP 201 Created

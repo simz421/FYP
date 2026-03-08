@@ -1,0 +1,150 @@
+classDiagram
+    %% --- Domain models ---
+    class Node {
+      +int id
+      +string device_id
+      +string name
+      +string node_type
+      +string status
+      +datetime last_seen
+      +int heartbeat_interval_sec
+      +bool is_registered
+      +int last_rssi
+      +int packets_received
+      +int packets_missed
+      +int uptime_seconds
+    }
+
+    class SensorReading {
+      +int id
+      +string device_id
+      +int node_id
+      +string sensor_type
+      +string parameter
+      +float value
+      +string unit
+      +datetime timestamp
+      +datetime created_at
+    }
+
+    class AlertEvent {
+      +int id
+      +string device_id
+      +int node_id
+      +string parameter
+      +int reading_id
+      +float value
+      +float min_value
+      +float max_value
+      +string severity
+      +string level
+      +string message
+      +bool is_active
+      +bool is_acked
+      +datetime created_at
+      +datetime acked_at
+      +datetime resolved_at
+    }
+
+    class ThresholdRule {
+      +int id
+      +string device_id
+      +int node_id
+      +string parameter
+      +float min_value
+      +float max_value
+      +bool is_enabled
+      +datetime updated_at
+    }
+
+    class SensorProfile {
+      +int id
+      +string device_id
+      +int node_id
+      +string parameter
+      +string unit
+      +bool is_enabled
+      +datetime created_at
+    }
+
+    class Link {
+      +int id
+      +int from_node
+      +int to_node
+      +int rssi
+      +float latency
+      +string status
+    }
+
+    class RouteEvent {
+      +int id
+      +string device_id
+      +string old_route
+      +string new_route
+      +string reason
+      +datetime timestamp
+    }
+
+    class AuditLog {
+      +int id
+      +string action_type
+      +string action
+      +string resource_type
+      +string resource_id
+      +string actor_type
+      +string actor_id
+      +string ip_address
+      +text details
+      +string status
+      +datetime created_at
+    }
+
+    %% --- Service classes (with method signatures) ---
+    class TelemetryService {
+      +ingest_telemetry(payload: Dict) : (status:int, body:Dict)
+      +_parse_timestamp(ts) : datetime
+      +_normalize_parameter(sensor_type) : string
+    }
+
+    class AlertsService {
+      +evaluate_reading(reading, auto_resolve: bool=True) : Dict
+      +evaluate_readings_batch(readings: List[SensorReading]) : List[Dict]
+      +list_alerts_page(...params) : (items:list, total:int)
+      +ack_alert(alert_id:int, note:str) : Dict
+      +resolve_alert(alert_id:int) : Dict
+    }
+
+    class MQTTService {
+      +attach_app(app)
+      +start()
+      +_on_message(topic, payload)
+    }
+
+    class WebsocketService {
+      +init_websocket(app)
+      +broadcast_new_reading(data:Dict)
+      +broadcast_new_alert(data:Dict)
+    }
+
+    class DataExporter {
+      +export_readings_csv(...)
+      +export_alerts_csv(...)
+      +export_devices_csv()
+      +export_full_backup() : Bytes
+    }
+
+    class ReportsService {
+      +build_time_series(start,end,parameter,...) : List
+      +generate_pdf(report_params) : Bytes
+    }
+
+    %% Associations
+    Node "1" --o"*" SensorReading : has
+    Node "1" --o"*" SensorProfile : has
+    Node "1" --o"*" AlertEvent : triggers
+    SensorReading "1" --o"1" AlertEvent : may_link_to
+    Node "1" --o"*" Link : from
+    Node "1" --o"*" Link : to
+    Node "1" --o"*" RouteEvent : logs
+    ThresholdRule "1" --o"*" AlertEvent : used_by
+    AuditLog "1" --o"*" RouteEvent : notes
